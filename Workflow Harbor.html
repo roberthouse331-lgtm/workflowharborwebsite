@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Workflow Harbor — AI SMS follow-up for Follow Up Boss</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg:        #0d0d12;
+    --bg-2:      #14141b;
+    --surface:   #181821;
+    --surface-2: #1f1f2a;
+    --line:      #262633;
+    --line-2:    #303040;
+    --ink:       #f4f4f6;
+    --ink-2:     #c8c8d0;
+    --ink-3:     #8d8d99;
+    --ink-4:     #5a5a68;
+    --coral:     #ff6f6f;
+    --coral-2:   #ff8a7e;
+    --coral-dim: #ff6f6f22;
+    --green:     #5ec98a;
+    --amber:     #f0b34a;
+    --blue:      #74a8ff;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11";
+  }
+  .mono { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace; }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+  @media (max-width: 720px) { .wrap { padding: 0 20px; } }
+
+  /* ---------- Nav ---------- */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,13,18,0.72);
+    backdrop-filter: saturate(160%) blur(12px);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.top .row {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand svg { display: block; }
+  .brand .name { font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { color: var(--ink-2); font-size: 14.5px; }
+  .nav-links a:hover { color: var(--ink); }
+  @media (max-width: 720px) { .nav-links a:not(.btn) { display: none; } }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-size: 14.5px; font-weight: 500;
+    border: 1px solid transparent;
+    transition: transform .12s ease, background .15s ease, border-color .15s ease;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--coral); color: #1a0a0a;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 8px 24px -8px var(--coral);
+  }
+  .btn-primary:hover { background: var(--coral-2); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--ink); border-color: var(--line-2);
+  }
+  .btn-ghost:hover { background: var(--surface); }
+  .btn-lg { padding: 16px 24px; font-size: 16px; }
+  .btn .arr { transition: transform .18s ease; }
+  .btn:hover .arr { transform: translateX(3px); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 80px 0 100px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: -200px 0 auto 0; height: 600px;
+    background:
+      radial-gradient(60% 80% at 25% 30%, #ff6f6f1f 0%, transparent 60%),
+      radial-gradient(50% 70% at 80% 10%, #74a8ff14 0%, transparent 60%);
+    z-index: 0; pointer-events: none;
+  }
+  .hero .grid {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px;
+    align-items: center;
+  }
+  @media (max-width: 980px) {
+    .hero { padding: 60px 0 72px; }
+    .hero .grid { grid-template-columns: 1fr; gap: 48px; }
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 8px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    font-size: 12.5px; color: var(--ink-2);
+    background: var(--surface);
+    margin-bottom: 28px;
+  }
+  .eyebrow .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 4px #5ec98a22;
+  }
+  .eyebrow .sep { color: var(--ink-4); }
+  h1.hero-h {
+    font-size: clamp(40px, 5.4vw, 64px);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+    margin: 0 0 24px;
+  }
+  h1.hero-h .accent { color: var(--coral); }
+  h1.hero-h .muted { color: var(--ink-3); }
+  .sub {
+    font-size: 19px; line-height: 1.55;
+    color: var(--ink-2);
+    margin: 0 0 36px;
+    max-width: 560px;
+  }
+  .cta-row {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+    margin-bottom: 22px;
+  }
+  .availability {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13.5px; color: var(--ink-3);
+  }
+  .availability .pulse {
+    position: relative; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--coral);
+  }
+  .availability .pulse::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px solid var(--coral); opacity: .4;
+    animation: pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.6); opacity: 0.7; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+
+  /* ---------- Phone / Chat mockup ---------- */
+  .phone-stage {
+    position: relative;
+    height: 620px;
+  }
+  @media (max-width: 980px) { .phone-stage { height: 580px; } }
+
+  .phone {
+    position: absolute; left: 50%; top: 0;
+    transform: translateX(-50%);
+    width: 340px; height: 620px;
+    background: #0a0a10;
+    border: 1px solid var(--line-2);
+    border-radius: 44px;
+    padding: 14px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 30px 80px -20px rgba(0,0,0,0.6),
+      0 60px 120px -40px var(--coral-dim);
+  }
+  .phone-screen {
+    position: relative;
+    width: 100%; height: 100%;
+    background: var(--bg-2);
+    border-radius: 32px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .phone-notch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 26px; border-radius: 14px;
+    background: #06060a;
+  }
+  .chat-head {
+    padding: 38px 16px 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(180deg, #16161e 0%, #14141b 100%);
+  }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--coral) 0%, #ff9a7e 100%);
+    color: #2a0c0c;
+    display: grid; place-items: center;
+    font-weight: 600; font-size: 14px;
+  }
+  .chat-head .who { display: flex; flex-direction: column; line-height: 1.2; }
+  .chat-head .who .name { font-weight: 600; font-size: 14.5px; }
+  .chat-head .who .num { font-size: 11.5px; color: var(--ink-3); }
+  .chat-head .badge {
+    margin-left: auto;
+    font-size: 10.5px; padding: 4px 8px; border-radius: 999px;
+    background: #5ec98a18; color: var(--green);
+    border: 1px solid #5ec98a44;
+    font-weight: 500;
+  }
+  .chat-body {
+    flex: 1; overflow: hidden;
+    padding: 14px 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .stamp {
+    text-align: center; font-size: 10.5px; color: var(--ink-4);
+    margin: 4px 0 8px;
+  }
+  .bubble {
+    max-width: 78%;
+    padding: 9px 13px;
+    border-radius: 18px;
+    font-size: 13.5px; line-height: 1.4;
+    word-wrap: break-word;
+  }
+  .bubble.in {
+    background: #25252f; color: var(--ink);
+    align-self: flex-start; border-bottom-left-radius: 6px;
+  }
+  .bubble.out {
+    background: var(--coral); color: #1a0a0a;
+    align-self: flex-end; border-bottom-right-radius: 6px;
+  }
+  .meta {
+    font-size: 10px; color: var(--ink-4);
+    align-self: flex-end;
+    margin-top: -2px; margin-bottom: 2px;
+  }
+  .meta.in { align-self: flex-start; }
+  .typing {
+    align-self: flex-start;
+    background: #25252f;
+    padding: 10px 13px; border-radius: 18px; border-bottom-left-radius: 6px;
+    display: inline-flex; gap: 4px;
+  }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3);
+    animation: blink 1.4s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+    40% { opacity: 1; transform: translateY(-2px); }
+  }
+
+  /* Floating alert card */
+  .alert-card {
+    position: absolute;
+    right: -24px; bottom: 60px;
+    width: 280px;
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    padding: 14px 14px 14px 16px;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.7);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .alert-card::before {
+    content: ""; position: absolute; left: 0; top: 14px; bottom: 14px;
+    width: 3px; background: var(--coral); border-radius: 0 3px 3px 0;
+  }
+  .alert-card .row1 {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11.5px; color: var(--ink-3);
+  }
+  .alert-card .label {
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--coral); font-weight: 600; font-size: 10.5px;
+  }
+  .alert-card .title { font-size: 14px; font-weight: 600; }
+  .alert-card .body { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+  @media (max-width: 980px) { .alert-card { right: -8px; bottom: 30px; } }
+  @media (max-width: 520px) {
+    .alert-card { right: 50%; transform: translateX(170px); width: 240px; }
+  }
+
+  /* status card top-left */
+  .status-card {
+    position: absolute;
+    left: -16px; top: 60px;
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+  }
+  .status-card .ico {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: #5ec98a18; color: var(--green);
+    display: grid; place-items: center;
+  }
+  .status-card .col { display: flex; flex-direction: column; line-height: 1.2; }
+  .status-card .col .t { font-size: 12.5px; font-weight: 600; }
+  .status-card .col .s { font-size: 10.5px; color: var(--ink-3); }
+  @media (max-width: 520px) {
+    .status-card { left: 50%; transform: translateX(-170px); }
+  }
+
+  /* ---------- Section primitives ---------- */
+  section { position: relative; }
+  .sec { padding: 96px 0; border-top: 1px solid var(--line); }
+  @media (max-width: 720px) { .sec { padding: 64px 0; } }
+
+  .label {
+    display: inline-block;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11.5px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-size: clamp(30px, 3.6vw, 44px);
+    line-height: 1.1; letter-spacing: -0.022em;
+    font-weight: 500;
+    margin: 0 0 24px;
+    max-width: 780px;
+  }
+  h2 .muted { color: var(--ink-3); }
+  .lead {
+    font-size: 18px; color: var(--ink-2); max-width: 680px;
+    margin: 0 0 48px;
+  }
+  .sec-head {
+    margin-bottom: 56px;
+  }
+
+  /* ---------- Problem section ---------- */
+  .problem-list {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  @media (max-width: 900px) { .problem-list { grid-template-columns: 1fr; } }
+  .problem-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 28px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .problem-card .iconwrap {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    display: grid; place-items: center;
+    color: var(--coral);
+  }
+  .problem-card h3 {
+    font-size: 19px; font-weight: 600; margin: 0;
+    letter-spacing: -0.01em;
+    min-height: calc(2 * 1.3em);
+  }
+  .problem-card p {
+    margin: 0; color: var(--ink-2); font-size: 15.5px; line-height: 1.55;
+  }
+  .pull-num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; color: var(--ink-4);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- What we built ---------- */
+  .built {
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: start;
+  }
+  @media (max-width: 900px) { .built { grid-template-columns: 1fr; gap: 32px; } }
+  .built .copy p {
+    color: var(--ink-2); font-size: 16.5px; margin: 0 0 18px;
+    max-width: 540px;
+  }
+  .feature-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  @media (max-width: 520px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feature-grid .cell {
+    background: var(--surface);
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 140px;
+  }
+  .feature-grid .cell .k {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--ink-4); text-transform: uppercase;
+  }
+  .feature-grid .cell .v {
+    font-size: 17px; font-weight: 500; letter-spacing: -0.005em;
+  }
+  .feature-grid .cell .d {
+    font-size: 13.5px; color: var(--ink-3); margin-top: auto;
+  }
+
+  /* ---------- How it works ---------- */
+  .steps {
+    position: relative;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  @media (max-width: 900px) { .steps { grid-template-columns: 1fr; gap: 12px; } }
+  .step {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 14px;
+    min-height: 220px;
+  }
+  .step .n {
+    font-family: 'Geist Mono', monospace;
+    color: var(--coral);
+    font-size: 12.5px; letter-spacing: 0.08em;
+  }
+  .step h3 {
+    font-size: 17px; font-weight: 600; margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .step p {
+    margin: 0; font-size: 14px; color: var(--ink-3); line-height: 1.5;
+  }
+  .step .tag {
+    margin-top: auto;
+    align-self: flex-start;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.08em;
+    color: var(--ink-4); text-transform: uppercase;
+    padding: 4px 8px; border: 1px solid var(--line-2); border-radius: 6px;
+  }
+  .step .arrow {
+    position: absolute;
+    right: -12px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    display: grid; place-items: center;
+    color: var(--ink-3);
+    z-index: 1;
+  }
+  .step:last-child .arrow { display: none; }
+  @media (max-width: 900px) {
+    .step .arrow { right: 50%; top: auto; bottom: -12px; transform: translateX(50%) rotate(90deg); }
+  }
+
+  .mid-cta {
+    margin-top: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    padding: 24px 28px;
+    border: 1px solid var(--line);
+    background:
+      linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%);
+    border-radius: 18px;
+  }
+  .mid-cta .t { font-size: 19px; font-weight: 500; letter-spacing: -0.01em; }
+  .mid-cta .s { font-size: 14px; color: var(--ink-3); }
+  @media (max-width: 720px) { .mid-cta { flex-direction: column; align-items: flex-start; } }
+
+  /* ---------- Why different (3 cols) ---------- */
+  .diff {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  @media (max-width: 900px) { .diff { grid-template-columns: 1fr; } }
+  .diff .col {
+    background: var(--surface);
+    padding: 36px 28px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .diff .col .quote {
+    font-size: 22px; font-weight: 500; letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .diff .col .quote::before { content: "“"; color: var(--coral); margin-right: 2px; }
+  .diff .col .quote::after { content: "”"; color: var(--coral); margin-left: 2px; }
+  .diff .col p {
+    margin: 0; font-size: 15px; color: var(--ink-2); line-height: 1.55;
+  }
+  .diff .col .tag {
+    margin-top: auto;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-4);
+  }
+
+  /* ---------- Offer ---------- */
+  .offer {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--coral);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -30px var(--coral-dim);
+  }
+  @media (max-width: 900px) { .offer { grid-template-columns: 1fr; } }
+  .offer .pane { background: var(--surface); padding: 36px; }
+  .offer .pane.dark { background: var(--bg-2); }
+  .offer h3 { font-size: 17px; font-weight: 600; margin: 0 0 18px; letter-spacing: -0.005em; }
+  .offer h3 .num { color: var(--coral); }
+  .check-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .check-list li {
+    display: grid; grid-template-columns: 22px 1fr; gap: 12px;
+    font-size: 15px; color: var(--ink-2); line-height: 1.5;
+  }
+  .check-list li .chk {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--coral); color: #1a0a0a;
+    display: grid; place-items: center;
+    margin-top: 1px;
+  }
+  .crit-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .crit-list li {
+    display: grid; grid-template-columns: 22px 1fr; gap: 12px;
+    font-size: 14.5px; color: var(--ink-2);
+  }
+  .crit-list li .b {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 1px solid var(--line-2); background: var(--bg);
+    display: grid; place-items: center;
+    color: var(--ink-3); font-family: 'Geist Mono', monospace; font-size: 11.5px;
+    margin-top: 1px;
+  }
+  .offer .ask {
+    font-size: 14.5px; color: var(--ink-3); line-height: 1.55;
+    margin: 0;
+  }
+  .offer .ask strong { color: var(--ink); font-weight: 500; }
+
+  /* ---------- FAQ ---------- */
+  .faq { max-width: 880px; margin: 0 auto; }
+  details.q {
+    border-top: 1px solid var(--line);
+    padding: 22px 4px;
+  }
+  details.q:last-of-type { border-bottom: 1px solid var(--line); }
+  details.q summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    font-size: 18px; font-weight: 500; letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  details.q summary::-webkit-details-marker { display: none; }
+  details.q .plus {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--line-2);
+    display: grid; place-items: center;
+    color: var(--ink-2);
+    transition: transform .2s ease, background .2s ease;
+    flex-shrink: 0;
+  }
+  details[open].q .plus { transform: rotate(45deg); background: var(--coral); color: #1a0a0a; border-color: var(--coral); }
+  details.q .a {
+    margin-top: 14px;
+    color: var(--ink-2);
+    font-size: 15.5px; line-height: 1.6;
+    max-width: 720px;
+  }
+
+  /* ---------- Final CTA ---------- */
+  .final {
+    text-align: center;
+    padding: 120px 0;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+  .final::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(50% 60% at 50% 50%, #ff6f6f1f 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .final .inner { position: relative; z-index: 1; }
+  .final h2 {
+    font-size: clamp(40px, 5.4vw, 64px);
+    margin: 0 auto 16px;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+    max-width: none;
+  }
+  .final h2 .accent { color: var(--coral); font-variant-numeric: tabular-nums; }
+  .final p { font-size: 19px; color: var(--ink-2); margin: 0 0 36px; }
+
+  /* ---------- Footer ---------- */
+  footer.bot {
+    border-top: 1px solid var(--line);
+    padding: 56px 0 40px;
+  }
+  footer .row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 32px; flex-wrap: wrap;
+  }
+  footer .col { display: flex; flex-direction: column; gap: 14px; }
+  footer .links { display: flex; gap: 24px; font-size: 14px; color: var(--ink-3); }
+  footer .links a:hover { color: var(--ink); }
+  footer .legal { font-size: 13px; color: var(--ink-4); }
+
+  /* ---------- Misc ---------- */
+  .sr { position: absolute; left: -10000px; }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="top">
+  <div class="wrap row">
+    <a href="#" class="brand" aria-label="Workflow Harbor home">
+      <!-- Logo mark recreated as SVG -->
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="6"  cy="12" r="4"   fill="#ff6f6f"/>
+        <rect   x="6"  y="10.4" width="20" height="3.2" rx="1.6" fill="#ff6f6f"/>
+        <circle cx="26" cy="12" r="5"   fill="#ff6f6f"/>
+        <circle cx="14" cy="28" r="5"   fill="#ff6f6f"/>
+        <rect   x="14" y="26.4" width="20" height="3.2" rx="1.6" fill="#ff6f6f"/>
+        <circle cx="34" cy="28" r="4"   fill="#ff6f6f"/>
+      </svg>
+      <span class="name">Workflow Harbor</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#why">Why it's different</a>
+      <a href="#offer">Pilot offer</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://calendly.com/workflowharbor-info/15-minute-demo" target="_blank" rel="noopener" class="btn btn-primary">Book a demo<span class="arr">→</span></a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap grid">
+    <div class="copy">
+      <div class="eyebrow">
+        <span class="dot"></span>
+        <span>For Follow Up Boss users</span>
+        <span class="sep">·</span>
+        <span class="mono">v0.4 — pilot</span>
+      </div>
+      <h1 class="hero-h">
+        Your real estate leads get a <span class="accent">real reply in 30 seconds.</span><br>
+        <span class="muted">From you. Without you typing it.</span>
+      </h1>
+      <p class="sub">
+        Workflow Harbor handles SMS lead follow-up for FUB users — greets new leads instantly,
+        holds a real back-and-forth conversation in your voice, qualifies them, and books
+        appointments on your Calendly while you're showing.
+      </p>
+      <div class="cta-row">
+        <a href="https://calendly.com/workflowharbor-info/15-minute-demo" target="_blank" rel="noopener" class="btn btn-primary btn-lg">See it work — book a 15-min demo<span class="arr">→</span></a>
+        <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
+      </div>
+      <div class="availability">
+        <span class="pulse"></span>
+        <span><strong style="color:var(--ink-2);font-weight:500;">3 design partner seats left.</strong>&nbsp; Free for 90 days.</span>
+      </div>
+    </div>
+
+    <!-- Phone mockup -->
+    <div class="phone-stage" aria-hidden="true">
+
+      <div class="status-card">
+        <div class="ico">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+        </div>
+        <div class="col">
+          <span class="t">New Zillow lead</span>
+          <span class="s">Texted in 23s · Mark T.</span>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="chat-head">
+            <div class="avatar">MT</div>
+            <div class="who">
+              <span class="name">Mark Thompson · Zillow</span>
+              <span class="num">+1 (415) 555-0142</span>
+            </div>
+            <div class="badge">AI active</div>
+          </div>
+          <div class="chat-body">
+            <div class="stamp mono">Today · 2:47 PM</div>
+
+            <div class="meta">You — auto-reply · 23s</div>
+            <div class="bubble out">
+              Hey Mark — Sarah at Coastal Realty. Saw you requested info on 142 Bayview Dr. I can pull comps and answer questions today. Quick one: are you actively looking or still browsing?
+            </div>
+
+            <div class="meta in">Mark · 1m</div>
+            <div class="bubble in">
+              Actively looking. Pre-approved through Chase. Looking to be in by August if possible
+            </div>
+
+            <div class="meta">You — auto-reply · 18s</div>
+            <div class="bubble out">
+              Nice — August is very doable. 3BR like Bayview or open to other layouts? And any non-negotiables? (yard, garage, school district)
+            </div>
+
+            <div class="meta in">Mark · 2m</div>
+            <div class="bubble in">
+              3BR minimum, fenced yard for the dog. Mill Valley schools ideally. Budget around 1.4
+            </div>
+
+            <div class="meta">You — auto-reply · just now</div>
+            <div class="bubble out">
+              Got it. I have 4 in that pocket I think you'll like. I'm at a showing til 4 — want to grab 20 min tomorrow morning to walk through them? calendly.com/sarah-coastal
+            </div>
+
+            <div class="typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-card">
+        <div class="row1">
+          <span class="label">Hot lead alert</span>
+          <span class="mono">3:01 PM</span>
+        </div>
+        <div class="title">Mark T. is ready to book</div>
+        <div class="body">Pre-approved, 1.4M, Mill Valley schools, August timeline. Calendly sent.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PROBLEM ============ -->
+<section class="sec" id="problem">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">The problem</span>
+      <h2>You're paying for leads.<br><span class="muted">Most go cold before you reach them.</span></h2>
+    </div>
+
+    <div class="problem-list">
+      <div class="problem-card">
+        <div class="iconwrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="13" r="8"/>
+            <path d="M12 9v4l2 2"/>
+            <path d="M9 2h6"/>
+          </svg>
+        </div>
+        <span class="pull-num">01 — speed</span>
+        <h3>Speed-to-lead is everything.</h3>
+        <p>The first 5 minutes matter more than the next 5 hours. You know it; you also know you can't text every Zillow lead within 5 minutes while you're at a showing.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="iconwrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1v22"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <span class="pull-num">02 — cost</span>
+        <h3>Inside Sales Agents (ISAs) cost $4–5k/mo.</h3>
+        <p>They work business hours. They quit. They miss texts. Their best month is your worst month.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="iconwrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="6" width="16" height="12" rx="2"/>
+            <path d="M8 10h8"/>
+            <path d="M8 14h5"/>
+          </svg>
+        </div>
+        <span class="pull-num">03 — drips</span>
+        <h3>Drip templates sound like drip templates.</h3>
+        <p>"Hi {FirstName}, just checking in!" stops converting after the second send. Leads can smell it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT WE BUILT ============ -->
+<section class="sec" id="built">
+  <div class="wrap built">
+    <div class="copy">
+      <span class="label">What we built</span>
+      <h2>An AI that texts your leads like you would — <span class="muted">if you had time.</span></h2>
+      <p>
+        Workflow Harbor sits on top of Follow Up Boss. When a new lead lands in FUB, our system
+        texts them within seconds — in your voice, from your dedicated number. The AI handles
+        the back-and-forth: asks the right questions, picks up on what they tell it, qualifies
+        them as hot, warm, or cold, and books showings on your Calendly automatically.
+      </p>
+      <p>
+        When a lead goes hot, you get an instant SMS alert on your personal phone with the full
+        context. One tap and you can take the conversation over yourself.
+      </p>
+      <p style="color: var(--ink-3); font-size: 15px;">
+        You stay in control. You see every message. You can pause the AI for any lead at any
+        time. Your existing FUB workflow doesn't change at all.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="cell">
+        <span class="k">Median response</span>
+        <span class="v">28 seconds</span>
+        <span class="d">From FUB lead-in to first SMS out, in pilot data.</span>
+      </div>
+      <div class="cell">
+        <span class="k">Sits on top of</span>
+        <span class="v">Follow Up Boss</span>
+        <span class="d">No CRM migration. Lead intake doesn't change.</span>
+      </div>
+      <div class="cell">
+        <span class="k">Sends from</span>
+        <span class="v">Your dedicated number</span>
+        <span class="d">Twilio A2P 10DLC compliant. Leads see one number.</span>
+      </div>
+      <div class="cell">
+        <span class="k">You can pause</span>
+        <span class="v">Any lead, one click</span>
+        <span class="d">Take over from the dashboard — no handoff seam.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">How it works</span>
+      <h2>Four steps. <span class="muted">No change to how you intake leads.</span></h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <span class="n">Step 01</span>
+        <h3>Lead lands in FUB</h3>
+        <p>From Zillow, your site, Realtor.com, an open house sign-in — anywhere you already capture leads.</p>
+        <div class="arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+        <span class="tag">Trigger</span>
+      </div>
+
+      <div class="step">
+        <span class="n">Step 02</span>
+        <h3>We text them in 30 seconds</h3>
+        <p>From your dedicated number, in your voice. Greet, contextualize the listing, ask one good question.</p>
+        <div class="arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+        <span class="tag">SMS out</span>
+      </div>
+
+      <div class="step">
+        <span class="n">Step 03</span>
+        <h3>Real conversation</h3>
+        <p>AI asks questions, picks up on answers, and silently scores the lead hot, warm, or cold as it goes.</p>
+        <div class="arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+        <span class="tag">Qualify</span>
+      </div>
+
+      <div class="step">
+        <span class="n">Step 04</span>
+        <h3>You get the alert</h3>
+        <p>Hot lead? You get an instant SMS with the full context. Ready to book? Calendly link sent automatically.</p>
+        <span class="tag">Convert</span>
+      </div>
+    </div>
+
+    <div class="mid-cta">
+      <div>
+        <div class="t">Want to see it live on a real conversation?</div>
+        <div class="s">15 minutes, no slide deck — we'll walk you through the dashboard and a live thread.</div>
+      </div>
+      <a href="https://calendly.com/workflowharbor-info/15-minute-demo" target="_blank" rel="noopener" class="btn btn-primary btn-lg">Book a 15-min demo<span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY DIFFERENT ============ -->
+<section class="sec" id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">Why it's different</span>
+      <h2>Three things you won't get from <span class="muted">a drip template or an ISA.</span></h2>
+    </div>
+
+    <div class="diff">
+      <div class="col">
+        <div class="quote">It writes every message in real time.</div>
+        <p>Built on Claude Opus 4.7 — Anthropic's most capable AI as of 2026. Every reply is generated from the actual conversation so far. It doesn't re-ask answered questions. When a lead says "I'm pre-approved, looking for a 3BR by August," the next message reflects that.</p>
+        <span class="tag">— Live generation</span>
+      </div>
+      <div class="col">
+        <div class="quote">It sounds like you, not like an AI tool.</div>
+        <p>We program your voice into the system on day one — tone, niche, market, the phrases you actually use. The AI texts on behalf of "Sarah at Coastal Realty," not "an assistant from Workflow Harbor."</p>
+        <span class="tag">— Your voice</span>
+      </div>
+      <div class="col">
+        <div class="quote">You stay in control.</div>
+        <p>Read every conversation in the dashboard. Pause the AI for any lead with one click. Take over by typing in the dashboard — your message goes out from the same number. The lead never sees a handoff. Your number, your CRM, your data.</p>
+        <span class="tag">— You first</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OFFER ============ -->
+<section class="sec" id="offer">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">The pilot</span>
+      <h2>We're testing on real production lead flow <span class="muted">with our final design partners.</span></h2>
+      <p class="lead">90 days, free, full system. We do all the setup. You give us honest feedback.</p>
+    </div>
+
+    <div class="offer">
+      <div class="pane">
+        <h3><span class="num">→</span> What you get</h3>
+        <ul class="check-list">
+          <li>
+            <span class="chk"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span>Full use of the system, free for 90 days.</span>
+          </li>
+          <li>
+            <span class="chk"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span>We do all setup — Twilio, Calendly, FUB. No DIY config.</span>
+          </li>
+          <li>
+            <span class="chk"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span>Weekly 30-min review calls so we can see what's landing with your leads and tune the AI in your voice.</span>
+          </li>
+          <li>
+            <span class="chk"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span>You own all conversations and data. Exportable anytime. Deletable on request.</span>
+          </li>
+        </ul>
+        <hr style="border:none;border-top:1px solid var(--line);margin:28px 0;">
+        <h3><span class="num">←</span> What we ask</h3>
+        <p class="ask">
+          Your honest feedback during the 90 days, and permission to use <strong>one anonymized result</strong>
+          from your usage in our marketing (e.g., "agent in [region] doubled their Zillow booking rate")
+          — never your name, brokerage, or any client information.
+        </p>
+      </div>
+
+      <div class="pane dark">
+        <h3>Who this is for</h3>
+        <ul class="crit-list">
+          <li>
+            <span class="b">A</span>
+            <span>Solo agent or small team on Follow Up Boss.</span>
+          </li>
+          <li>
+            <span class="b">B</span>
+            <span>At least 20 leads/month coming in.</span>
+          </li>
+          <li>
+            <span class="b">C</span>
+            <span>Willing to do 30 minutes of feedback per week.</span>
+          </li>
+          <li>
+            <span class="b">D</span>
+            <span>Comfortable letting AI text your leads with your supervision.</span>
+          </li>
+        </ul>
+
+        <div style="margin-top: 36px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;">
+          <div class="mono" style="font-size: 11px; color: var(--ink-4); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px;">Spots remaining</div>
+          <div style="display: flex; align-items: baseline; gap: 14px;">
+            <div style="font-size: 44px; font-weight: 500; letter-spacing: -0.03em; color: var(--coral); font-variant-numeric: tabular-nums;">3</div>
+            <div style="font-size: 14px; color: var(--ink-3);">design partner seats left.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="sec-head" style="text-align:center;">
+      <span class="label">Questions</span>
+      <h2 style="margin-left:auto;margin-right:auto;">Things you're probably wondering.</h2>
+    </div>
+
+    <div class="faq">
+      <details class="q" open>
+        <summary>What's a "design partner"?<span class="plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">Friendly term for an early customer who helps shape the product. You get full use, free, for 90 days. We get real-world testing and your honest feedback. No commitment past the 90 days from either side.</div>
+      </details>
+
+      <details class="q">
+        <summary>Will my leads know they're texting AI?<span class="plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">Some will suspect; many won't. AI follow-up is normal in 2026 — your competitors are already doing it. The real question is whether leads convert — and our early data is stronger than templated drips. We'll happily talk through disclosure rules in your state.</div>
+      </details>
+
+      <details class="q">
+        <summary>What if the AI says something wrong?<span class="plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">Three layers of safety: (1) the AI is tuned to your voice on day one and we adjust it weekly, (2) you get an instant alert before any hot lead progresses, (3) one click pauses the AI for any lead and lets you take over.</div>
+      </details>
+
+      <details class="q">
+        <summary>Does this replace Follow Up Boss?<span class="plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">No. We sit on top of FUB. You keep using FUB exactly as you do today. Lead intake doesn't change. Conversation activity will appear in FUB once our partner integration completes (in progress).</div>
+      </details>
+
+      <details class="q">
+        <summary>What about TCPA / opt-outs?<span class="plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">Built in. STOP, UNSUBSCRIBE, CANCEL, and similar keywords trigger automatic opt-out — the lead is flagged and we never message them again. Twilio A2P 10DLC compliant.</div>
+      </details>
+
+      <details class="q">
+        <summary>What happens after the 90 days?<span class="plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <div class="a">We talk. If it's working, we'll discuss what continuing looks like together. If it isn't, no hard feelings — you've gotten 90 days of free AI follow-up and your data is yours.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final" id="demo">
+  <div class="wrap inner">
+    <span class="label">Let's talk</span>
+    <h2><span class="accent">3</span> design partner spots open.</h2>
+    <p>15 minutes is all we need to show you whether this fits.</p>
+    <a href="https://calendly.com/workflowharbor-info/15-minute-demo" target="_blank" rel="noopener" class="btn btn-primary btn-lg" style="padding: 18px 28px; font-size: 17px;">Book a demo<span class="arr">→</span></a>
+    <div style="margin-top: 24px; font-size: 13px; color: var(--ink-4);" class="mono">
+      Or email <a href="/cdn-cgi/l/email-protection#ee87808881ae99819c8588828199868f9c8c819cc08d8183" style="color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px;"><span class="__cf_email__" data-cfemail="70191e161f30071f021b161c1f07181102121f025e131f1d">[email&#160;protected]</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bot">
+  <div class="wrap row">
+    <div class="col">
+      <a href="#" class="brand">
+        <svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <circle cx="6"  cy="12" r="4"   fill="#ff6f6f"/>
+          <rect   x="6"  y="10.4" width="20" height="3.2" rx="1.6" fill="#ff6f6f"/>
+          <circle cx="26" cy="12" r="5"   fill="#ff6f6f"/>
+          <circle cx="14" cy="28" r="5"   fill="#ff6f6f"/>
+          <rect   x="14" y="26.4" width="20" height="3.2" rx="1.6" fill="#ff6f6f"/>
+          <circle cx="34" cy="28" r="4"   fill="#ff6f6f"/>
+        </svg>
+        <span class="name" style="font-size:16px;">Workflow Harbor</span>
+      </a>
+      <div class="legal mono">© 2026 Workflow Harbor LLC. All rights reserved.</div>
+    </div>
+    <div class="col" style="align-items:flex-end;">
+      <div class="links">
+        <a href="/cdn-cgi/l/email-protection#ea83848c85aa9d8598818c86859d828b98888598c4898587"><span class="__cf_email__" data-cfemail="d0b9beb6bf90a7bfa2bbb6bcbfa7b8b1a2b2bfa2feb3bfbd">[email&#160;protected]</span></a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+      <div class="legal" style="text-align:right;max-width:380px;">
+        Built for Follow Up Boss users. Not affiliated with Follow Up Boss, Zillow, Calendly, or Twilio.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>
